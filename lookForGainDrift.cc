@@ -116,10 +116,18 @@ int lookForGainDrift(int channel, int ct){
     g[i]->SetMarkerStyle(23);
     g[i]->Write(gDesc[i]);
 	}
-	
+
+  char hTitle[50];
+  sprintf(hTitle,"spectrum_Ch%d",channel);
+  TKey *hkey = newFile->FindKey(hTitle);
+  if(hkey!=0){
+    hkey->Delete(); 
+    printf("Removed histogram %s and will re-write\n",hTitle);
+    }
+
   chain.Draw( Form("energy>>htemp(%d, %f, %f)",jn,jmin,jmax), Form("((channel==%d)&&(timestamp<(300.*pow(10.,8.))))",channel), "goff");
   htemp = (TH1D*)gDirectory->Get("htemp");
-  htemp->Write( Form("spectrum_Ch%d",channel) );
+  htemp->Write(hTitle);
   
   newFile->Close();
   
